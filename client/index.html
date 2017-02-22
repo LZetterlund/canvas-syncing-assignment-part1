@@ -1,13 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- import the websocket client library. You can code websockets from scratch
+         but we will just import a library. In this case we are using socket.io which is 
+         one of the most popular and feature rich websocket libraries.
+         
+         You can point the src for the script to any host online, but
+         by default the socket.io nodejs library will host the client library
+         online at your node.js address under /socket.io/socket.io.js 
+         You can disable that on the server if desired
+    -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
-    <script type="text/babel" >
-        "use strict";
-    
+    <script type="text/babel">
+        const connectSocket = (e) => {
+            const socket = io.connect();
+            const send = document.querySelector("#send");
+            send.addEventListener('click', function(){
+                socket.emit('msgNumber');
+                return false;
+            });   
+
+            socket.on('connect', () => {
+                console.log('connecting');
+        
+                socket.emit('join');        
+                socket.emit('msgNumber');       
+            });
+
+            socket.on('updateNum', (data) => {
+                console.log(data);
+                const message = data.message;
+                const chat = document.querySelector("#chat");
+                chat.value = message;
+            });
+        };
+
+        const init = () => {
+            const chat = document.querySelector("#chat");
+            chat.value = "Enter a username and press connect to join. \n"
+            connectSocket();
+        };
+
+        window.onload = init;
     </script>
+	<style>
+		textarea {
+			display: block;
+			background-color: #EEEEEE;
+		}
+	</style>
 </head>
 <body>
-
+	<br/>
+	<label for="message">Add 1:</label>
+	<input id="send" type="button" value="+1" />
+	
+	<textarea id="chat" rows="20" cols="40" readonly> </textarea>
 </body>
 </html>
